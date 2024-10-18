@@ -2,9 +2,13 @@ import { useState } from 'react';
 import { StyleSheet, View, Text, TextInput, ImageBackground, TouchableOpacity } from 'react-native';
 
 const Start = ({ navigation }) => {
+  // State for storing the user's name
   const [name, setName] = useState('');
+  // State for storing the selected background color
   const [selectedColor, setSelectedColor] = useState('');
+  // Array of color options
   const colors = ['#FFA726', '#81D4FA', '#FFF59D', '#A5D6A7'];
+  // Function to handle selecting a background color
   const handleColorSelect = (color) => {
     setSelectedColor(color);
   };
@@ -22,6 +26,7 @@ const Start = ({ navigation }) => {
           <TextInput
             style={[
               styles.textInput,
+              // Adjust opacity based on whether the name input has text
               { opacity: name ? 1 : 0.5 }
             ]}
             value={name}
