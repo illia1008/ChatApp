@@ -1,66 +1,60 @@
 import { useState, useEffect } from 'react';
 import { StyleSheet, KeyboardAvoidingView, Platform, View, Text } from 'react-native';
 import { Bubble, GiftedChat } from "react-native-gifted-chat";
+import { collection, query, orderBy, onSnapshot, addDoc } from "firebase/firestore";
 
-const Chat = ({ route, navigation }) => {
+
+const Chat = ({ route, navigation, db, userId }) => {
   // Destructure the name and backgroundColor values from the route parameters
   const { name, backgroundColor } = route.params;
   // Set up state for the messages using the useState hook
   const [messages, setMessages] = useState([]);
+  
   // Function to handle sending new messages
   const onSend = (newMessages) => {
-    setMessages(previousMessages => GiftedChat.append(previousMessages, newMessages))
+    addDoc(collection(db, "messages"), newMessages[0]);
   }
 
   // useEffect hook to perform actions when the component mounts
   useEffect(() => {
+    // Set the navigation title based on the user's name
     navigation.setOptions({ title: name });
-    // Initialize the messages state with an array of sample messages
-    setMessages([
-      {
-        _id: 1,
-        text: 'Hello developer',
-        createdAt: new Date(),
-        user: {
-          _id: 2,
-          name: 'React Native',
-          avatar: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTi-OwzXUqF0m_NO2OEDVmm0f6o95xDVugByw&s',
-        },
-      },
-      {
-        _id: 2,
-        text: 'This is a system message',
-        createdAt: new Date(),
-        system: true,
-      },
-    ]);
-  }, []);
 
-  // const renderBubble = (props) => {
-  //   return <Bubble
-  //     {...props}
-  //     wrapperStyle={{
-  //       right: {
-  //         backgroundColor: "#000"
-  //       },
-  //       left: {
-  //         backgroundColor: "#FFF"
-  //       }
-  //     }}
-  //   />
-  // }
+    // Reference the messages collection and set up a query to order by createdAt in descending order
+    const messagesQuery = query(
+      collection(db, "messages"),
+      orderBy("createdAt", "desc")
+    );
+
+    // Set up the onSnapshot listener
+    const unsubscribe = onSnapshot(messagesQuery, (snapshot) => {
+      const fetchedMessages = snapshot.docs.map((doc) => {
+        const data = doc.data();
+        return {
+          _id: doc.id,
+          text: data.text,
+          createdAt: data.createdAt.toDate(),
+          user: data.user,
+        };
+      });
+
+      setMessages(fetchedMessages);
+    });
+
+    // Clean up the listener on component unmount
+    return () => unsubscribe();
+  }, []);
 
 
   return (
-    // Main container view with the background color set from the route parameter or defaulting to white
     <View style={[styles.container, { backgroundColor: backgroundColor || '#FFF' }]}>
       <GiftedChat
         messages={messages}
-        // renderBubble={renderBubble}
         onSend={messages => onSend(messages)}
         user={{
-          _id: 1
-        }}
+          _id: userId,
+          name: name
+      }}
       />
       {Platform.OS === 'android' ? <KeyboardAvoidingView behavior="height" /> : null}
     </View>
