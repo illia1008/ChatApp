@@ -4,9 +4,9 @@ import { Bubble, GiftedChat } from "react-native-gifted-chat";
 import { collection, query, orderBy, onSnapshot, addDoc } from "firebase/firestore";
 
 
-const Chat = ({ route, navigation, db, userId }) => {
+const Chat = ({ route, navigation, db }) => {
   // Destructure the name and backgroundColor values from the route parameters
-  const { name, backgroundColor } = route.params;
+  const { name, backgroundColor, userId } = route.params;
   // Set up state for the messages using the useState hook
   const [messages, setMessages] = useState([]);
   
