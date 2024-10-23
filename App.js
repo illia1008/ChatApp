@@ -1,16 +1,31 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
 import { initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
+import { getFirestore, disableNetwork, enableNetwork } from "firebase/firestore";
 import Start from './components/Start';
 import Chat from './components/Chat';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { useNetInfo } from "@react-native-community/netinfo";
+import { useEffect } from "react";
+import { getStorage } from "firebase/storage";
+import { LogBox, Alert } from "react-native";
 
 // Create the navigator
 const Stack = createNativeStackNavigator();
 
 const App = () => {
+
+  const connectionStatus = useNetInfo();
+
+  useEffect(() => {
+    if (connectionStatus.isConnected === false) {
+      Alert.alert("Connection Lost!");
+      disableNetwork(db);
+    } else if (connectionStatus.isConnected === true) {
+      enableNetwork(db);
+    }
+  }, [connectionStatus.isConnected]);
 
   const firebaseConfig = {
     apiKey: "AIzaSyAjUSC2PA56DoORlcCo5anrGZEfXUsooq4",
@@ -27,7 +42,7 @@ const App = () => {
   // Initialize Cloud Firestore and get a reference to the service
   const db = getFirestore(app);
 
-
+  const storage = getStorage(app);
 
   return (
     <NavigationContainer>
@@ -39,10 +54,9 @@ const App = () => {
           component={Start}
         />
         <Stack.Screen
-          name="Chat"
-          // Pass db as a prop using the component prop
-          component={(props) => <Chat {...props} db={db} />}
-        />
+          name="Chat">
+            {props => <Chat isConnected={connectionStatus.isConnected} db={db} storage={storage} {...props}/>}
+        </Stack.Screen>
       </Stack.Navigator>
     </NavigationContainer>
   );
