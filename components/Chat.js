@@ -16,7 +16,6 @@ const Chat = ({ route, navigation, db, isConnected, storage }) => {
 
   // Function to handle sending new messages
   const onSend = (newMessages) => {
-    console.log(newMessages)
     addDoc(collection(db, "messages"), newMessages[0])
       .catch((error) => {
         console.error("Error adding document: ", error);
