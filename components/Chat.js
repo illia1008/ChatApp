@@ -1,11 +1,14 @@
 import { useState, useEffect } from 'react';
 import { StyleSheet, KeyboardAvoidingView, Platform, View, Text } from 'react-native';
-import { Bubble, GiftedChat, InputToolbar } from "react-native-gifted-chat";
+import { Bubble, GiftedChat, InputToolbar, renderActions } from "react-native-gifted-chat";
 import { collection, query, orderBy, onSnapshot, addDoc } from "firebase/firestore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import CustomActions from './CustomActions';
+import MapView from "react-native-maps";
+import { v4 as uuidv4 } from 'uuid';
 
 
-const Chat = ({ route, navigation, db, isConnected }) => {
+const Chat = ({ route, navigation, db, isConnected, storage }) => {
   // Destructure the name and backgroundColor values from the route parameters
   const { name, backgroundColor, userId } = route.params;
   // Set up state for the messages using the useState hook
@@ -13,6 +16,7 @@ const Chat = ({ route, navigation, db, isConnected }) => {
 
   // Function to handle sending new messages
   const onSend = (newMessages) => {
+    console.log(newMessages)
     addDoc(collection(db, "messages"), newMessages[0])
       .catch((error) => {
         console.error("Error adding document: ", error);
@@ -29,8 +33,8 @@ const Chat = ({ route, navigation, db, isConnected }) => {
   }
 
   let unsubMessages;
-  useEffect(() => {
 
+  useEffect(() => {
     if (isConnected === true) {
       if (unsubMessages) unsubMessages();
       unsubMessages = null;
@@ -71,15 +75,58 @@ const Chat = ({ route, navigation, db, isConnected }) => {
     } catch (error) {
       console.error("Error loading cached messages: ", error);
     }
-  };
-
+  }
+  
+  const renderBubble = (props) => {
+    return (
+    <Bubble
+      {...props}
+      wrapperStyle={{
+        right: {
+          backgroundColor: "#A9A9A9"
+        },
+        left: {
+          backgroundColor: "#FFF"
+        }
+      }}
+    />
+  )
+ }
+ 
+   const renderCustomActions = (props) => {
+     return <CustomActions name={name} userId={userId} storage={storage} onSend={onSend} {...props}/>;
+   }
+ 
+   const renderCustomView = (props) => {
+     const { currentMessage} = props;
+     if (currentMessage.location) {
+       return (
+           <MapView
+             style={{width: 150,
+               height: 100,
+               borderRadius: 13,
+               margin: 3}}
+             region={{
+               latitude: currentMessage.location.latitude,
+               longitude: currentMessage.location.longitude,
+               latitudeDelta: 0.0922,
+               longitudeDelta: 0.0421,
+             }}
+           />
+       );
+     }
+     return null;
+   }
 
   return (
     <View style={[styles.container, { backgroundColor: backgroundColor || '#FFF' }]}>
       <GiftedChat
         messages={messages}
         renderInputToolbar={renderInputToolbar}
+        renderBubble={renderBubble}
+        renderActions={renderCustomActions}
         onSend={messages => onSend(messages)}
+        renderCustomView={renderCustomView}
         user={{
           _id: userId,
           name: name
