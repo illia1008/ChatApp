@@ -38,8 +38,8 @@ Follow these steps to set up the project locally:
 1. Clone the repository:
 
 ```bash
-$ git clone https://github.com/elodloic/ChatApp.git
-$ cd ChatApp
+git clone https://github.com/elodloic/ChatApp.git
+cd ChatApp#
 
 2. Install dependencies:
 
