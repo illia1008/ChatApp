@@ -89,17 +89,20 @@ const CustomActions = ({ wrapperStyle, onSend, userId, name, storage }) => {
       if (location) {
         onSend([
           {
+            _id: uuidv4(),
+            location: {
+              longitude: location.coords.longitude,
+              latitude: location.coords.latitude,
+            },
+            text: "Location",
             createdAt: new Date(),
             user: {
               _id: userId,
               name: name,
             },
-            location: {
-              longitude: location.coords.longitude,
-              latitude: location.coords.latitude,
-            },
           },
-        ]);
+        ]);  
+      
       } else Alert.alert("Error occurred while fetching location");
     } else Alert.alert("Permissions haven't been granted.");
   };
