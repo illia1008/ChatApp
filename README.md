@@ -46,11 +46,13 @@ cd ChatApp
 
 Make sure to have Node.js v18.20.4 installed. Then run this command in a terminal to install the dependencies in the project folder:
 ```bash
-npm install#
+npm install
+```
 
 Then install the Expo CLI as a global dependency (if you haven't already):
 ```bash
-npm install -g expo-cli#
+npm install -g expo-cli
+```
 
 Configure Firebase: Go to Firebase Console, create a new project, and add a web app. Then copy your Firebase config credentials. Finally, add them to the "Firebase credentials" section of the "App.js" file:
 
@@ -61,11 +63,13 @@ authDomain: "YOUR_AUTH_DOMAIN",
 projectId: "YOUR_PROJECT_ID",
 storageBucket: "YOUR_STORAGE_BUCKET",
 messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-appId: "YOUR_APP_ID"#
+appId: "YOUR_APP_ID"
+```
 
 Run the app locally:
 ```bash
-npm run start#
+npm run start
+```
 
 ## How to Use
 1. On the Start page, enter your name and select a background color.
